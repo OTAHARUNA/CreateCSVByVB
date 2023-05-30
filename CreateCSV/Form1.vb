@@ -1,6 +1,7 @@
 ﻿Imports System.IO
 Imports System.Text
 Imports System.Collections
+Imports log4net.Config
 
 Public Class Form1
 #Region "定数"
@@ -8,6 +9,10 @@ Public Class Form1
 #Region "変数"
 
 #End Region
+
+    Sub Main()
+        XmlConfigurator.Configure(New FileInfo("log.config"))
+    End Sub
 
 #Region "もとになるCSVファイルD&D"
     ''' <summary>
@@ -33,8 +38,8 @@ Public Class Form1
     Private Sub TargetFullPath_DragDrop(ByVal sender As Object, ByVal e As DragEventArgs) Handles TargetFullPath.DragDrop
         If e.Data.GetDataPresent(DataFormats.FileDrop) Then
             Dim files As String() = CType(e.Data.GetData(DataFormats.FileDrop), String())
-            ' ドラッグされたファイルに対する処理を行う
 
+            ' ドラッグされたファイルに対する処理を行う
             If files.Length > 1 Then
                 'メッセージボックスを表示する
                 Class1.ShowMessageBox("ファイルは1ファイルしか取り込めません", "Error")
@@ -60,6 +65,8 @@ Public Class Form1
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
     Private Sub TargetReButtonf_Click(sender As Object, e As EventArgs) Handles TargetRef.Click
+        Logger.LogInfo("処理時間：")
+
         ' ファイルダイアログを開く変数を作成しインスタンス化
         Dim Dialog As New OpenFileDialog()
         ' 各パラメータを設定していきます
@@ -138,6 +145,8 @@ Public Class Form1
 
             'メッセージボックスを表示する
             Class1.ShowMessageBox("作成完了しました", "Result")
+
+            Logger.LogInfo("処理時間：")
 
             '出力先のフォルダを開く
             'System.Diagnostics.Process.Start(strOutputPath)
