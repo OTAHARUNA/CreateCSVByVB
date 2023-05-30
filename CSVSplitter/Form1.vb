@@ -112,22 +112,17 @@ Public Class Form1
     ''' CSV作成ボタンを押したら
     ''' </summary>
     Private Sub SplitButton_Click() Handles Split.Click
-        Dim strTargetFullPath As String = TargetFullPath.Text    'もととなるcsvファイルフルパス
-        Dim strCreateRow As Integer = CreateRow.Text        '作成する行
-        Dim strHeaderRow As Integer = HeaderRow.Text          'ヘッダの行数
-        Dim strOutputPath As String = OutputPath.Text       '出力先パス
+        Dim strTargetFullPath As String = TargetFullPath.Text   'もととなるcsvファイルフルパス
+        Dim strCreateRow As Integer = CreateRow.Text            '作成する行
+        Dim strHeaderRow As Integer = HeaderRow.Text            'ヘッダの行数
+        Dim strOutputPath As String = OutputPath.Text           '出力先パス
 
+        Dim strFileName As String = Path.GetFileName(strTargetFullPath)             'ファイル名
+        Dim strOutputFullPath As String = strOutputPath & strFileName.Insert(strFileName.Length - 4, "_" & strCreateRow.ToString)  '出力先フルパス ※作成するファイル名は末尾に作成行数を記載する
 
-        Dim strFileName As String = Path.GetFileName(strTargetFullPath)  'ファイル名
-
-        Dim lines As String() = File.ReadAllLines(strTargetFullPath, Encoding.UTF8)     'ファイルの中身行を格納
-        Dim strOutputFullPath As String '出力先フルパス
-
+        Dim lines As String() = File.ReadAllLines(strTargetFullPath, Encoding.UTF8) 'ファイルの中身行を格納
 
         Try
-            '作成するファイル名は末尾に作成行数を記載する
-            strOutputFullPath = strOutputPath & strFileName.Insert(strFileName.Length - 4, "_" & strCreateRow.ToString)
-
             Using writer As New StreamWriter(strOutputFullPath, False, Encoding.UTF8)
                 'ヘッダの書き込み
                 For i As Integer = 0 To strHeaderRow - 1
