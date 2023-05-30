@@ -26,27 +26,4 @@
     End Sub
 #End Region
 
-#Region "メッセージボックス処理結果"
-    ''' <summary>
-    ''' メッセージボックス
-    ''' </summary>
-    Public Shared Sub ShowMessageBoxResult(message As String)
-        MessageBox.Show(message,
-                        "処理結果",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.None)
-    End Sub
-#End Region
-
-#Region "メッセージボックス注意"
-    ''' <summary>
-    ''' メッセージボックス
-    ''' </summary>
-    Public Shared Sub ShowMessageBoxAttention(message As String)
-        MessageBox.Show(message,
-                        "注意",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Exclamation)
-    End Sub
-#End Region
 End Class
