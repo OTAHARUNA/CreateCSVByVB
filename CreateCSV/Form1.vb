@@ -139,6 +139,7 @@ Public Class Form1
             lines = File.ReadAllLines(strTargetFullPath, Encoding.UTF8) 'ファイルの中身行を格納
 
             startTime = DateTime.Now
+            Logger.Log("～" & strCreateRow.ToString & "件のCSVファイルを作成します～")
             Logger.Log("【開始時間】" & startTime.ToString)
             Cursor.Current = Cursors.WaitCursor
 
@@ -214,24 +215,33 @@ Public Class Form1
 
             '大量データ対策の為一定の行数毎
             For batchIndex As Integer = 0 To Math.Ceiling(strCreateRow / intBatchSize) - 1
-                '行毎
-                For i As Integer = 1 To intBatchSize
-                    duplicatedData = Nothing              '行を読み込むごとに初期化
-                    dataIndex = If(batchIndex = 0, i, batchIndex * intBatchSize + i)
+                Using memoryStream As New MemoryStream()
+                    Using streamWriter As New StreamWriter(memoryStream)
+                        '行毎
+                        For i As Integer = 1 To intBatchSize
+                            duplicatedData = Nothing              '行を読み込むごとに初期化
+                            dataIndex = If(batchIndex = 0, i, batchIndex * intBatchSize + i)
 
-                    '列毎
-                    For j As Integer = 0 To columns.Length - 1
-                        duplicatedData += columns(j).Trim() & dataIndex.ToString()  'データの末尾に行番号を追加して内容を変更する
+                            '列毎
+                            For j As Integer = 0 To columns.Length - 1
+                                duplicatedData += columns(j).Trim() & dataIndex.ToString()  'データの末尾に行番号を追加して内容を変更する
 
-                        '最後の列でなければ、カンマを追加
-                        If j <> columns.Length - 1 Then
-                            duplicatedData += ","
-                        End If
-                    Next
+                                '最後の列でなければ、カンマを追加
+                                If j <> columns.Length - 1 Then
+                                    duplicatedData += ","
+                                End If
+                            Next
 
-                    '処理時間懸念の為、毎行毎にファイル書き込みを行う
-                    writer.WriteLine(duplicatedData.ToArray)
-                Next
+                            '処理時間懸念の為、毎行毎にファイル書き込みを行う
+                            writer.WriteLine(duplicatedData.ToArray)
+                        Next
+
+                        ' メモリストリームの内容をファイルに書き込む
+                        streamWriter.Flush()
+                        memoryStream.Seek(0, SeekOrigin.Begin)
+                        memoryStream.CopyTo(writer.BaseStream)
+                    End Using
+                End Using
             Next
         End If
     End Sub
