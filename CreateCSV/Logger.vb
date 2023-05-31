@@ -1,13 +1,13 @@
-﻿Imports log4net
+﻿Imports System.IO
 
 Public Class Logger
-        Private Shared ReadOnly log As ILog = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType)
+    Private Shared logFilePath As String = "C:\Users\chopp\source\repos\CreateCSV\CreateCSV\log\log_" & DateTime.Now.ToString("yyyyMMddHHmmss") & ".log"
 
-        Public Shared Sub LogInfo(message As String)
-            log.Info(message)
-        End Sub
+    Public Shared Sub Log(message As String)
+        Dim logEntry As String = $"{DateTime.Now} - {message}"
 
-        Public Shared Sub LogError(message As String, ex As Exception)
-            log.Error(message, ex)
-        End Sub
-    End Class
+        Using writer As New StreamWriter(logFilePath, True)
+            writer.WriteLine(logEntry)
+        End Using
+    End Sub
+End Class

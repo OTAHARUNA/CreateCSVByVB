@@ -1,7 +1,6 @@
 ﻿Imports System.IO
 Imports System.Text
 Imports System.Collections
-Imports log4net.Config
 
 Public Class Form1
 #Region "定数"
@@ -10,13 +9,10 @@ Public Class Form1
 
 #End Region
 
-    Sub Main()
-        XmlConfigurator.Configure(New FileInfo("log.config"))
-    End Sub
 
 #Region "もとになるCSVファイルD&D"
     ''' <summary>
-    ''' もとになるCSVファイルD&D
+    ''' もとになるCSVファイルドラッグアンドドロップ
     ''' </summary>
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
@@ -31,7 +27,7 @@ Public Class Form1
 
 #Region "もとになるCSVファイルD&D"
     ''' <summary>
-    ''' もとになるCSVファイルD&D
+    ''' もとになるCSVファイルドラッグアンドドロップ
     ''' </summary>
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
@@ -65,8 +61,6 @@ Public Class Form1
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
     Private Sub TargetReButtonf_Click(sender As Object, e As EventArgs) Handles TargetRef.Click
-        Logger.LogInfo("処理時間：")
-
         ' ファイルダイアログを開く変数を作成しインスタンス化
         Dim Dialog As New OpenFileDialog()
         ' 各パラメータを設定していきます
@@ -129,7 +123,14 @@ Public Class Form1
 
         Dim lines As String() = File.ReadAllLines(strTargetFullPath, Encoding.UTF8) 'ファイルの中身行を格納
 
+        Dim startTime As DateTime
+        ' 終了時刻を保持
+        Dim endTime As DateTime
+
         Try
+            startTime = DateTime.Now
+            Logger.Log("【開始時間】" & startTime.ToString)
+
             Using writer As New StreamWriter(strOutputFullPath, False, Encoding.UTF8)
                 'ヘッダの書き込み
                 For i As Integer = 0 To strHeaderRow - 1
@@ -146,12 +147,19 @@ Public Class Form1
             'メッセージボックスを表示する
             Class1.ShowMessageBox("作成完了しました", "Result")
 
-            Logger.LogInfo("処理時間：")
+            endTime = DateTime.Now
+            Logger.Log("【終了時間】" & endTime.ToString)
+
+            Logger.Log("【処理時間】" & (endTime - startTime).ToString())
 
             '出力先のフォルダを開く
             'System.Diagnostics.Process.Start(strOutputPath)
             '出力先したファイルを開く 上記は残すか考え中
-            Process.Start(strOutputFullPath)
+            If strCreateRow + 2 < 100000 Then                       '作成した行数が10万件以下の場合
+                Process.Start(strOutputFullPath)                    'Excelで開く
+            Else
+                Process.Start("EmEditor.exe", strOutputFullPath)    '大量件数の為EmEditorで開く
+            End If
 
         Catch ex As ArithmeticException
             Class1.ShowMessageBox("処理に失敗しました。ご確認ください", "Error")
@@ -169,6 +177,9 @@ Public Class Form1
     ''' <param name="writer"></param>
     ''' </summary>
     Private Sub MakeDataRow(strHeaderRow As Integer, strCreateRow As Integer, strOutputFullPath As String, lines As String(), writer As StreamWriter)
+        Dim intBatchSize As Integer = 10000 ' バッチサイズ
+        intBatchSize = If(strCreateRow <= intBatchSize, strCreateRow, intBatchSize) ' バッチサイズ
+
         'チェックがついていなかったらそのまま内容複製
         If ChangeRowFlg.Checked = False Then
             '行の書き込み
@@ -181,21 +192,25 @@ Public Class Form1
 
             '行の書き込み
             columns = lines(strHeaderRow).Split(","c) ' 列ごとにデータを分割
-            '行毎
-            For i As Integer = 1 To strCreateRow
-                duplicatedData = Nothing              '行を読み込むごとに初期化
-                '列毎
-                For j As Integer = 0 To columns.Length - 1
-                    duplicatedData += columns(j).Trim() & i.ToString()  'データの末尾に行番号を追加して内容を変更する
 
-                    '最後の列でなければ、カンマを追加
-                    If j <> columns.Length - 1 Then
-                        duplicatedData += ","
-                    End If
+            '大量データ対策の為一定の行数毎
+            For batchIndex As Integer = 0 To Math.Ceiling(strCreateRow / intBatchSize) - 1
+                '行毎
+                For i As Integer = 1 To intBatchSize
+                    duplicatedData = Nothing              '行を読み込むごとに初期化
+                    '列毎
+                    For j As Integer = 0 To columns.Length - 1
+                        duplicatedData += columns(j).Trim() & i.ToString()  'データの末尾に行番号を追加して内容を変更する
+
+                        '最後の列でなければ、カンマを追加
+                        If j <> columns.Length - 1 Then
+                            duplicatedData += ","
+                        End If
+                    Next
+
+                    '処理時間懸念の為、毎行毎にファイル書き込みを行う
+                    writer.WriteLine(duplicatedData.ToArray)
                 Next
-
-                '処理時間懸念の為、毎行毎にファイル書き込みを行う
-                writer.WriteLine(duplicatedData.ToArray)
             Next
         End If
     End Sub
