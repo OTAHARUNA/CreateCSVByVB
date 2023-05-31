@@ -118,18 +118,29 @@ Public Class Form1
         Dim strHeaderRow As Integer = HeaderRow.Text            'ヘッダの行数
         Dim strOutputPath As String = OutputPath.Text           '出力先パス
 
-        Dim strFileName As String = Path.GetFileName(strTargetFullPath)             'ファイル名
-        Dim strOutputFullPath As String = strOutputPath & strFileName.Insert(strFileName.Length - 4, "_" & strCreateRow.ToString)  '出力先フルパス ※作成するファイル名は末尾に作成行数を記載する
+        Dim strFileName As String           'ファイル名
+        Dim strOutputFullPath As String     '出力先フルパス ※作成するファイル名は末尾に作成行数を記載する
+        Dim lines As String()               'ファイルの中身行を格納
 
-        Dim lines As String() = File.ReadAllLines(strTargetFullPath, Encoding.UTF8) 'ファイルの中身行を格納
-
-        Dim startTime As DateTime
-        ' 終了時刻を保持
-        Dim endTime As DateTime
+        Dim startTime As DateTime           ' 開始時刻
+        Dim endTime As DateTime             ' 終了時刻
 
         Try
+            '入力チェック
+            If Not File.Exists(strTargetFullPath) Then
+                Class1.ShowMessageBox("対象ファイルのパスがおかしいです。ご確認ください", "Error")
+                TargetFullPath.BackColor = Color.Red
+                Exit Sub
+            End If
+
+            '変数設定
+            strFileName = Path.GetFileName(strTargetFullPath)             'ファイル名
+            strOutputFullPath = strOutputPath & strFileName.Insert(strFileName.Length - 4, "_" & strCreateRow.ToString)  '出力先フルパス ※作成するファイル名は末尾に作成行数を記載する
+            lines = File.ReadAllLines(strTargetFullPath, Encoding.UTF8) 'ファイルの中身行を格納
+
             startTime = DateTime.Now
             Logger.Log("【開始時間】" & startTime.ToString)
+            Cursor.Current = Cursors.WaitCursor
 
             Using writer As New StreamWriter(strOutputFullPath, False, Encoding.UTF8)
                 'ヘッダの書き込み
@@ -145,11 +156,18 @@ Public Class Form1
             Init()
 
             'メッセージボックスを表示する
+            Cursor.Current = Cursors.Default
+            Me.TopMost = True       '他のアプリ含めて最前面に表示する
+            'MessageBox.Show(Me, "作成完了しました", "処理結果", MessageBoxButtons.OK, MessageBoxIcon.None)
             Class1.ShowMessageBox("作成完了しました", "Result")
+            'OK押下されたら戻す
+            Me.TopMost = False
 
             endTime = DateTime.Now
             Logger.Log("【終了時間】" & endTime.ToString)
 
+            'Dim ts As TimeSpan
+            'Logger.Log("【処理時間】" & (TimeSpan.TryParseExact((endTime - startTime).ToString(), "'h'時間'm'分's'秒'fff", Nothing, ts)))
             Logger.Log("【処理時間】" & (endTime - startTime).ToString())
 
             '出力先のフォルダを開く
@@ -177,7 +195,7 @@ Public Class Form1
     ''' <param name="writer"></param>
     ''' </summary>
     Private Sub MakeDataRow(strHeaderRow As Integer, strCreateRow As Integer, strOutputFullPath As String, lines As String(), writer As StreamWriter)
-        Dim intBatchSize As Integer = 10000 ' バッチサイズ
+        Dim intBatchSize As Integer = 100000 ' バッチサイズ
         intBatchSize = If(strCreateRow <= intBatchSize, strCreateRow, intBatchSize) ' バッチサイズ
 
         'チェックがついていなかったらそのまま内容複製
@@ -189,6 +207,7 @@ Public Class Form1
         Else            'チェックがついていたら末尾に数字をつける
             Dim columns As String()
             Dim duplicatedData As String
+            Dim dataIndex As String
 
             '行の書き込み
             columns = lines(strHeaderRow).Split(","c) ' 列ごとにデータを分割
@@ -198,9 +217,11 @@ Public Class Form1
                 '行毎
                 For i As Integer = 1 To intBatchSize
                     duplicatedData = Nothing              '行を読み込むごとに初期化
+                    dataIndex = If(batchIndex = 0, i, batchIndex * intBatchSize + i)
+
                     '列毎
                     For j As Integer = 0 To columns.Length - 1
-                        duplicatedData += columns(j).Trim() & i.ToString()  'データの末尾に行番号を追加して内容を変更する
+                        duplicatedData += columns(j).Trim() & dataIndex.ToString()  'データの末尾に行番号を追加して内容を変更する
 
                         '最後の列でなければ、カンマを追加
                         If j <> columns.Length - 1 Then

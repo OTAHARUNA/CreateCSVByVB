@@ -39,9 +39,10 @@ Partial Class Form1
         'Split
         '
         Me.Split.Font = New System.Drawing.Font("MS UI Gothic", 18.0!)
-        Me.Split.Location = New System.Drawing.Point(336, 307)
+        Me.Split.Location = New System.Drawing.Point(560, 460)
+        Me.Split.Margin = New System.Windows.Forms.Padding(5, 4, 5, 4)
         Me.Split.Name = "Split"
-        Me.Split.Size = New System.Drawing.Size(120, 49)
+        Me.Split.Size = New System.Drawing.Size(200, 74)
         Me.Split.TabIndex = 0
         Me.Split.Text = "CSV作成"
         Me.Split.UseVisualStyleBackColor = True
@@ -49,107 +50,116 @@ Partial Class Form1
         'Label1
         '
         Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(177, 48)
+        Me.Label1.Location = New System.Drawing.Point(295, 72)
+        Me.Label1.Margin = New System.Windows.Forms.Padding(5, 0, 5, 0)
         Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(132, 12)
+        Me.Label1.Size = New System.Drawing.Size(199, 18)
         Me.Label1.TabIndex = 1
         Me.Label1.Text = "ベースとなるファイルフルパス"
         '
         'TargetFullPath
         '
         Me.TargetFullPath.AllowDrop = True
-        Me.TargetFullPath.Location = New System.Drawing.Point(318, 45)
+        Me.TargetFullPath.Location = New System.Drawing.Point(530, 68)
+        Me.TargetFullPath.Margin = New System.Windows.Forms.Padding(5, 4, 5, 4)
         Me.TargetFullPath.Name = "TargetFullPath"
-        Me.TargetFullPath.Size = New System.Drawing.Size(288, 19)
+        Me.TargetFullPath.Size = New System.Drawing.Size(477, 25)
         Me.TargetFullPath.TabIndex = 2
         Me.TargetFullPath.Text = "D&Dもできます"
         Me.TargetFullPath.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
         'CreateRow
         '
-        Me.CreateRow.Location = New System.Drawing.Point(318, 103)
+        Me.CreateRow.Location = New System.Drawing.Point(530, 154)
+        Me.CreateRow.Margin = New System.Windows.Forms.Padding(5, 4, 5, 4)
         Me.CreateRow.Name = "CreateRow"
-        Me.CreateRow.Size = New System.Drawing.Size(288, 19)
+        Me.CreateRow.Size = New System.Drawing.Size(477, 25)
         Me.CreateRow.TabIndex = 4
         Me.CreateRow.Text = "2"
         '
         'Label2
         '
         Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(177, 106)
+        Me.Label2.Location = New System.Drawing.Point(295, 159)
+        Me.Label2.Margin = New System.Windows.Forms.Padding(5, 0, 5, 0)
         Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(103, 12)
+        Me.Label2.Size = New System.Drawing.Size(155, 18)
         Me.Label2.TabIndex = 3
         Me.Label2.Text = "何行作成しますか？"
         '
         'OutputPath
         '
-        Me.OutputPath.Location = New System.Drawing.Point(318, 218)
+        Me.OutputPath.Location = New System.Drawing.Point(530, 327)
+        Me.OutputPath.Margin = New System.Windows.Forms.Padding(5, 4, 5, 4)
         Me.OutputPath.Name = "OutputPath"
-        Me.OutputPath.Size = New System.Drawing.Size(288, 19)
+        Me.OutputPath.Size = New System.Drawing.Size(477, 25)
         Me.OutputPath.TabIndex = 8
         '
         'Label4
         '
         Me.Label4.AutoSize = True
-        Me.Label4.Location = New System.Drawing.Point(177, 221)
+        Me.Label4.Location = New System.Drawing.Point(295, 332)
+        Me.Label4.Margin = New System.Windows.Forms.Padding(5, 0, 5, 0)
         Me.Label4.Name = "Label4"
-        Me.Label4.Size = New System.Drawing.Size(41, 12)
+        Me.Label4.Size = New System.Drawing.Size(62, 18)
         Me.Label4.TabIndex = 7
         Me.Label4.Text = "出力先"
         '
         'TargetRef
         '
-        Me.TargetRef.Location = New System.Drawing.Point(632, 43)
+        Me.TargetRef.Location = New System.Drawing.Point(1053, 64)
+        Me.TargetRef.Margin = New System.Windows.Forms.Padding(5, 4, 5, 4)
         Me.TargetRef.Name = "TargetRef"
-        Me.TargetRef.Size = New System.Drawing.Size(75, 23)
+        Me.TargetRef.Size = New System.Drawing.Size(125, 34)
         Me.TargetRef.TabIndex = 9
         Me.TargetRef.Text = "参照"
         Me.TargetRef.UseVisualStyleBackColor = True
         '
         'OutputRef
         '
-        Me.OutputRef.Location = New System.Drawing.Point(632, 216)
+        Me.OutputRef.Location = New System.Drawing.Point(1053, 324)
+        Me.OutputRef.Margin = New System.Windows.Forms.Padding(5, 4, 5, 4)
         Me.OutputRef.Name = "OutputRef"
-        Me.OutputRef.Size = New System.Drawing.Size(75, 23)
+        Me.OutputRef.Size = New System.Drawing.Size(125, 34)
         Me.OutputRef.TabIndex = 10
         Me.OutputRef.Text = "参照"
         Me.OutputRef.UseVisualStyleBackColor = True
         '
         'HeaderRow
         '
-        Me.HeaderRow.Location = New System.Drawing.Point(318, 159)
-        Me.HeaderRow.Margin = New System.Windows.Forms.Padding(5, 4, 5, 4)
+        Me.HeaderRow.Location = New System.Drawing.Point(530, 238)
+        Me.HeaderRow.Margin = New System.Windows.Forms.Padding(8, 6, 8, 6)
         Me.HeaderRow.Name = "HeaderRow"
-        Me.HeaderRow.Size = New System.Drawing.Size(288, 19)
+        Me.HeaderRow.Size = New System.Drawing.Size(477, 25)
         Me.HeaderRow.TabIndex = 15
         Me.HeaderRow.Text = "2"
         '
         'Label5
         '
         Me.Label5.AutoSize = True
-        Me.Label5.Location = New System.Drawing.Point(177, 162)
-        Me.Label5.Margin = New System.Windows.Forms.Padding(5, 0, 5, 0)
+        Me.Label5.Location = New System.Drawing.Point(295, 243)
+        Me.Label5.Margin = New System.Windows.Forms.Padding(8, 0, 8, 0)
         Me.Label5.Name = "Label5"
-        Me.Label5.Size = New System.Drawing.Size(141, 12)
+        Me.Label5.Size = New System.Drawing.Size(211, 18)
         Me.Label5.TabIndex = 14
         Me.Label5.Text = "対象のヘッダは何行ですか？"
         '
         'ChangeRowFlg
         '
         Me.ChangeRowFlg.AutoSize = True
-        Me.ChangeRowFlg.Location = New System.Drawing.Point(577, 263)
+        Me.ChangeRowFlg.Location = New System.Drawing.Point(962, 394)
+        Me.ChangeRowFlg.Margin = New System.Windows.Forms.Padding(5, 4, 5, 4)
         Me.ChangeRowFlg.Name = "ChangeRowFlg"
-        Me.ChangeRowFlg.Size = New System.Drawing.Size(134, 16)
+        Me.ChangeRowFlg.Size = New System.Drawing.Size(199, 22)
         Me.ChangeRowFlg.TabIndex = 16
         Me.ChangeRowFlg.Text = "毎行内容変更したいか"
         Me.ChangeRowFlg.UseVisualStyleBackColor = True
         '
         'Form1
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 12.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(10.0!, 18.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(800, 450)
+        Me.ClientSize = New System.Drawing.Size(1333, 675)
         Me.Controls.Add(Me.ChangeRowFlg)
         Me.Controls.Add(Me.HeaderRow)
         Me.Controls.Add(Me.Label5)
@@ -162,6 +172,7 @@ Partial Class Form1
         Me.Controls.Add(Me.TargetFullPath)
         Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.Split)
+        Me.Margin = New System.Windows.Forms.Padding(5, 4, 5, 4)
         Me.Name = "Form1"
         Me.Text = "Form1"
         Me.ResumeLayout(False)
