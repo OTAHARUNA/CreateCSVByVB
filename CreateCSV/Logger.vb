@@ -1,7 +1,7 @@
 ﻿Imports System.IO
 
 Public Class Logger
-    Private Shared logFilePath As String = "C:\Users\chopp\source\repos\CreateCSV\CreateCSV\log\log_" & DateTime.Now.ToString("yyyyMMddHHmmss") & ".log"
+    Private Shared logFilePath As String = "C:\Users\chopp\source\repos\CreateCSV\CreateCSV\log\log_" & DateTime.Now.ToString("yyyyMMdd") & ".log"
 
     Public Shared Sub Log(message As String)
         Dim logEntry As String = $"{DateTime.Now} - {message}"
