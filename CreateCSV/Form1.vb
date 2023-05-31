@@ -1,7 +1,7 @@
 ﻿Imports System.IO
 Imports System.Text
 Imports System.Collections
-
+Imports System.Threading.Tasks
 Public Class Form1
 #Region "定数"
 #End Region
@@ -142,15 +142,7 @@ Public Class Form1
             Logger.Log("【開始時間】" & startTime.ToString)
             Cursor.Current = Cursors.WaitCursor
 
-            Using writer As New StreamWriter(strOutputFullPath, False, Encoding.UTF8)
-                'ヘッダの書き込み
-                For i As Integer = 0 To strHeaderRow - 1
-                    writer.WriteLine(lines(i))
-                Next
-
-                'データ書き込み
-                MakeDataRow(strHeaderRow, strCreateRow, strOutputFullPath, lines, writer)
-            End Using
+            Main(strOutputFullPath, strHeaderRow, lines, strCreateRow)
 
             '処理成功したら初期状態に戻す
             Init()
@@ -184,6 +176,30 @@ Public Class Form1
         End Try
     End Sub
 #End Region
+#Region "データ作成"
+    ''' <summary>
+    ''' データ作成
+    ''' </summary>
+    Private Sub Main(strOutputFullPath As String, strHeaderRow As Integer, lines As String(), strCreateRow As Integer)
+        Try
+            Using writer As New StreamWriter(strOutputFullPath, False, Encoding.UTF8)
+                'ヘッダの書き込み
+                For i As Integer = 0 To strHeaderRow - 1
+                    writer.WriteLineAsync(lines(i))
+                Next
+
+                'データ書き込み
+                MakeDataRow(strHeaderRow, strCreateRow, strOutputFullPath, lines, writer).Wait()
+                ' ファイルをクローズする
+                writer.Close()
+            End Using
+
+        Catch ex As ArithmeticException
+            Class1.ShowMessageBox("処理に失敗しました。ご確認ください", "Error")
+        End Try
+
+    End Sub
+#End Region
 
 #Region "データ作成"
     ''' <summary>
@@ -194,47 +210,61 @@ Public Class Form1
     ''' <param name="lines"></param>
     ''' <param name="writer"></param>
     ''' </summary>
-    Private Sub MakeDataRow(strHeaderRow As Integer, strCreateRow As Integer, strOutputFullPath As String, lines As String(), writer As StreamWriter)
-        Dim intBatchSize As Integer = 100000 ' バッチサイズ
-        intBatchSize = If(strCreateRow <= intBatchSize, strCreateRow, intBatchSize) ' バッチサイズ
+    Private Async Function MakeDataRow(strHeaderRow As Integer, strCreateRow As Integer, strOutputFullPath As String, lines As String(), writer As StreamWriter) As Task
+        Try
+            Dim intBatchSize As Integer = 100000 ' バッチサイズ
+            intBatchSize = If(strCreateRow <= intBatchSize, strCreateRow, intBatchSize) ' バッチサイズ
 
-        'チェックがついていなかったらそのまま内容複製
-        If ChangeRowFlg.Checked = False Then
-            '行の書き込み
-            For i As Integer = strHeaderRow To strCreateRow
-                writer.WriteLine(lines(strHeaderRow))
-            Next
-        Else            'チェックがついていたら末尾に数字をつける
-            Dim columns As String()
-            Dim duplicatedData As String
-            Dim dataIndex As String
-
-            '行の書き込み
-            columns = lines(strHeaderRow).Split(","c) ' 列ごとにデータを分割
-
-            '大量データ対策の為一定の行数毎
-            For batchIndex As Integer = 0 To Math.Ceiling(strCreateRow / intBatchSize) - 1
-                '行毎
-                For i As Integer = 1 To intBatchSize
-                    duplicatedData = Nothing              '行を読み込むごとに初期化
-                    dataIndex = If(batchIndex = 0, i, batchIndex * intBatchSize + i)
-
-                    '列毎
-                    For j As Integer = 0 To columns.Length - 1
-                        duplicatedData += columns(j).Trim() & dataIndex.ToString()  'データの末尾に行番号を追加して内容を変更する
-
-                        '最後の列でなければ、カンマを追加
-                        If j <> columns.Length - 1 Then
-                            duplicatedData += ","
-                        End If
-                    Next
-
-                    '処理時間懸念の為、毎行毎にファイル書き込みを行う
-                    writer.WriteLine(duplicatedData.ToArray)
+            'チェックがついていなかったらそのまま内容複製
+            If ChangeRowFlg.Checked = False Then
+                '行の書き込み
+                For i As Integer = strHeaderRow To strCreateRow
+                    writer.WriteLine(lines(strHeaderRow))
                 Next
-            Next
-        End If
-    End Sub
+            Else            'チェックがついていたら末尾に数字をつける
+                Dim columns As String()
+                Dim duplicatedData As String
+                Dim dataIndex As String
+
+                '行の書き込み
+                columns = lines(strHeaderRow).Split(","c) ' 列ごとにデータを分割
+
+                '大量データ対策の為一定の行数毎
+                For batchIndex As Integer = 0 To Math.Ceiling(strCreateRow / intBatchSize) - 1
+                    'Using memoryStream As New MemoryStream()
+                    '    Using streamWriter As New StreamWriter(memoryStream)
+                    '行毎
+                    For i As Integer = 1 To intBatchSize
+                        duplicatedData = Nothing              '行を読み込むごとに初期化
+                        dataIndex = If(batchIndex = 0, i, batchIndex * intBatchSize + i)
+
+                        '列毎
+                        For j As Integer = 0 To columns.Length - 1
+                            duplicatedData += columns(j).Trim() & dataIndex.ToString()  'データの末尾に行番号を追加して内容を変更する
+
+                            '最後の列でなければ、カンマを追加
+                            If j <> columns.Length - 1 Then
+                                duplicatedData += ","
+                            End If
+                        Next
+
+                        '処理時間懸念の為、毎行毎にファイル書き込みを行う
+                        Await writer.WriteLineAsync(duplicatedData.ToArray)
+                    Next
+                    '' メモリストリームの内容をファイルに書き込む
+                    'Await streamWriter.FlushAsync()
+                    'memoryStream.Seek(0, SeekOrigin.Begin)
+                    'Await memoryStream.CopyToAsync(writer.BaseStream)
+                    '    End Using
+                    'End Using
+                Next
+            End If
+            'Throw New Exception("エラーメッセージ")
+
+        Catch ex As ArithmeticException
+            Class1.ShowMessageBox("同期処理中にエラー発生。ご確認ください", "Error")
+        End Try
+    End Function
 #End Region
 
 #Region "初期状態に戻す"
